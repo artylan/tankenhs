@@ -11,6 +11,8 @@ module Lib
     totalLiters,
     formatYearsCosts,
     formatYearsLiters,
+    totalKilometers,
+    consumption,
   )
 where
 
@@ -81,10 +83,16 @@ sumYears selector records = map (sumYear selector records) years
     years = extractYears records
 
 formatYears :: (Record -> Double) -> String -> [Record] -> [String]
-formatYears selector aUnit records = map (\(x, y) -> printf "%d : %7.2f %s\n" x y aUnit) (sumYears selector records)
+formatYears selector aUnit records = map (\(x, y) -> printf "Jahr %d: %8.2f %s.\n" x y aUnit) (sumYears selector records)
 
 formatYearsCosts :: [Record] -> [String]
 formatYearsCosts = formatYears (\r -> r.costs) "Euro"
 
 formatYearsLiters :: [Record] -> [String]
 formatYearsLiters = formatYears (\r -> r.liters) "Liter"
+
+totalKilometers :: [Record] -> Int
+totalKilometers records = (last records).km - (head records).km
+
+consumption :: [Record] -> Double
+consumption records = (totalLiters records - (last records).liters) / fromIntegral (totalKilometers records) * 100.0
